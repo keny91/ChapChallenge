@@ -53,7 +53,20 @@ def load_image_from_folder_byIndex(folder,index):
 #         # print (x)
 #         for y in range(0,ymax):
             
-            
+# cv.rectangle(scract_image8bNorm, (scract_sample_location[0]-margin, scract_sample_location[1]-margin), (scract_sample_location[0]+margin, scract_sample_location[1]+margin), (255,255,255),10)            
+
+def getImageCutoffAroundPoint(image,point,distance):
+    
+    # missing validation for out of bounds... skippping because the search areas are very central
+    # if()
+    x = point[0]
+    y = point[1]
+    crop_img = image[y-distance:y+distance, x-distance:x+distance]
+    fig = plt.figure(1)
+    fig, (ax1) = plt.subplots(1, 1)
+    ax1.imshow(crop_img)
+    return  crop_img 
+        
     
 def find_board( image):
         """
