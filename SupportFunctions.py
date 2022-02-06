@@ -44,17 +44,6 @@ def load_image_from_folder_byIndex(folder,index):
 
     return None
 
-
-
-# def findTopLeftMost(image):
-    
-#     xmax,ymax = image.shape()
-#     for x in range(xmax):
-#         # print (x)
-#         for y in range(0,ymax):
-            
-# cv.rectangle(scract_image8bNorm, (scract_sample_location[0]-margin, scract_sample_location[1]-margin), (scract_sample_location[0]+margin, scract_sample_location[1]+margin), (255,255,255),10)            
-
 def getImageCutoffAroundPoint(image,point,distance):
     
     # missing validation for out of bounds... skippping because the search areas are very central
@@ -62,12 +51,16 @@ def getImageCutoffAroundPoint(image,point,distance):
     x = point[0]
     y = point[1]
     crop_img = image[y-distance:y+distance, x-distance:x+distance]
-    fig = plt.figure(1)
-    fig, (ax1) = plt.subplots(1, 1)
-    ax1.imshow(crop_img)
+
     return  crop_img 
         
-    
+def showQuickImage(image,tittle):
+    fig = plt.figure(1)
+    fig, (ax1) = plt.subplots(1, 1)
+    ax1.set_title(tittle)
+    ax1.imshow(image, cmap="gray")    
+
+
 def find_board( image):
         """
         Finds a board by calling openCV function to find contures in image.
@@ -108,26 +101,22 @@ def find_board( image):
 
         return our_cnt
 
+#dilation
+def dilate(image, units):
+    kernel = np.ones((units,units),np.uint8)
+    return cv.dilate(image, kernel, iterations = 1)
+    
+#erosion
+def erode(image,units):
+    kernel = np.ones((units,units),np.uint8)
+    return cv.erode(image, kernel, iterations = 1)
 
-# def getRectangle(image):
-    
-#     topLeftMost = 
-    
-#     high_left = [-1,-1]
-#     high_right = [-1,-1]
-#     low_left = [-1,-1]
-#     high_right = [-1,-1]
-    
-#     xmax,ymax = image.shape()
-    
-#     for x in range(xmax):
-#         # print (x)
-#         for y in range(0,ymax):
-            
-#             if(not image[x][y]):
-                
-            
-#     return 
-                
-    
+#opening - erosion followed by dilation
+def opening(image,units):
+    kernel = np.ones((units,units),np.uint8)
+    return cv.morphologyEx(image, cv.MORPH_OPEN, kernel)
+
+def close(image,units):
+    kernel = np.ones((units,units),np.uint8)
+    return cv.morphologyEx(image, cv.MORPH_CLOSE, kernel)
     
