@@ -62,14 +62,73 @@ def showQuickImage(image,tittle):
 
 def show2ImagesSideBySide(im1,im2,tittle):
     fig1 = plt.figure
-    fig1, (ax1, ax2) = plt.subplots(1, 2, sharex=False, sharey=False) 
+    fig1, (ax1, ax2) = plt.subplots(1, 2, sharex=False, sharey=False,figsize=(9, 9)) 
     fig1.suptitle(tittle)
 
     ax1.get_yaxis().set_visible(False)
     ax1.get_xaxis().set_visible(False)
     
+
+    
     ax1.imshow(im1,cmap='gray')
     ax2.imshow(im2,cmap='gray')
+    
+def show2ImagesSideBySideOut(im1,im2):
+    fig1 = plt.figure
+    fig1, (ax1, ax2) = plt.subplots(1, 2, sharex=False, sharey=False,figsize=(9, 9)) 
+
+    ax1.get_yaxis().set_visible(False)
+    ax1.get_xaxis().set_visible(False)
+    
+    ax1.set_title('Area')
+    ax2.set_title('ScratchSeg')
+    
+    ax1.imshow(im1,cmap='gray')
+    ax2.imshow(im2,cmap='gray')
+    
+def show3ImagesSideBySide(im1,im2,im3,tittle):
+    fig1 = plt.figure
+    fig1, (ax1, ax2,ax3) = plt.subplots(1, 3, sharex=False, sharey=False,figsize=(9, 9)) 
+    fig1.suptitle(tittle)
+
+    ax1.get_yaxis().set_visible(False)
+    ax1.get_xaxis().set_visible(False)
+    
+    ax2.get_yaxis().set_visible(False)
+    ax2.get_xaxis().set_visible(False)
+    
+    ax3.get_yaxis().set_visible(False)
+    ax3.get_xaxis().set_visible(False)
+    
+    ax1.set_title('Area')
+    ax2.set_title('ScratchSeg')
+    ax3.set_title('CrackSeg')
+    
+    ax1.imshow(im1,cmap='gray')
+    ax2.imshow(im2,cmap='gray')
+    ax3.imshow(im3,cmap='gray')
+    
+def show3ImagesSideBySideOut(im1,im2,im3):
+    fig1 = plt.figure
+    fig1, (ax1, ax2,ax3) = plt.subplots(1, 3, sharex=False, sharey=False,figsize=(9, 9)) 
+
+    ax1.get_yaxis().set_visible(False)
+    ax1.get_xaxis().set_visible(False)
+    
+    ax2.get_yaxis().set_visible(False)
+    ax2.get_xaxis().set_visible(False)
+    
+    ax3.get_yaxis().set_visible(False)
+    ax3.get_xaxis().set_visible(False)
+    
+    ax1.set_title('Area')
+    ax2.set_title('ScratchSeg')
+    ax3.set_title('CrackSeg')
+    
+    ax1.imshow(im1,cmap='gray')
+    ax2.imshow(im2,cmap='gray')
+    ax3.imshow(im3,cmap='gray')
+    
 
 
 def showQuickHist(image,hist):
