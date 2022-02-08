@@ -3,7 +3,6 @@
 
 /**	NOTE ***
  * 		
- * 		After seeing these structures I do get the idea of how I could have solved  
  * 
  * 
  * */
@@ -22,6 +21,8 @@
 /**
  * 	In a few words, we will be initializing an 'countOfImageBuffers' number of buffers.
  * 
+
+
  * 	unsigned short is the right value to store pixel representation, matching the 16bit depth I worked with in my challenges.
  * 
  * */
@@ -33,8 +34,8 @@ void InitializeImagesBuffers(int countOfImageBuffers)
 
 	//Initialize buffers of images and array of pointers
 	//to each profile of each buffer
-	_ppBufferImages = new unsigned short*[countOfImageBuffers] ;  			// 	pipeline buffer
-	_pppLinesBufferImages = new unsigned short **[countOfImageBuffers];		//	
+	_ppBufferImages = new unsigned short*[countOfImageBuffers] ;  			// 	pointer to image buffer
+	_pppLinesBufferImages = new unsigned short **[countOfImageBuffers];		//	pointer to an array of values tracking bit memory of images
 
 	// we will now initialize 
 	for( int idx = 0;  idx < countOfImageBuffers; idx++ )
@@ -43,14 +44,14 @@ void InitializeImagesBuffers(int countOfImageBuffers)
 		//_deviceWidth = 2000
 
 		_ppBufferImages[idx] = new unsigned short[_deviceWidth*_deviceHeight] ;  //  alloc the matrix size
-		memset(_ppBufferImages[idx], 0, sizeof(unsigned short)*_deviceWidth*_deviceHeight ) ;
+		memset(_ppBufferImages[idx], 0, sizeof(unsigned short)*_deviceWidth*_deviceHeight ) ;  // init mat as 0s
 
-		_pppLinesBufferImages[idx] = new unsigned short*[_deviceHeight];  // we prepare the space to store image columns
+		_pppLinesBufferImages[idx] = new unsigned short*[_deviceHeiofght];  // we prepare the space to store image rows
 		for(int jdx = 0; jdx < _deviceHeight; jdx++) 
 		{
-			_pppLinesBufferImages[idx][jdx] = 
-				_ppBufferImages[idx] + _deviceWidth*jdx  ;
-		}
+			_pppLinesBufferImages[idx][jdx] = 					// in each row/entry we 
+				_ppBufferImages[idx] + _deviceWidth*jdx  ;		// each entry should contain increments of _deviceWidth
+		}														// from 0 to _deviceWidth*_deviceWidth
 	}
 }
 
@@ -60,14 +61,14 @@ void InitializeImagesBuffers(int countOfImageBuffers)
 //
 //--------------------------------------------------------------------------------------------------------
 void AddImage( const int& palletNumber, 
-	const unsigned char** const ppBuffer,
+const unsigned char** const ppBuffer	// we are not allowed to modify the buffer here
 	const DeviceConfiguration* deviceConfig, 
 	const FileFormat &fileFormat,
 	double vMarkFirstProfile )
 {
-	int			slot, prevPalletNumber ;
-	CString deviceName = deviceConfig->GetName() ;
-	ReposPalletsMap::const_iterator iPalletNumber ;
+	int			slot, prevPalletNumber ;				// 
+	CString deviceName = deviceConfig->GetName() ;		// camera name 
+	ReposPalletsMap::const_iterator iPalletNumber ;		//	
 
 	//Ejemplos de estructuras de datos
 	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -95,24 +96,31 @@ void AddImage( const int& palletNumber,
 	ReposPalletsMap _pallets;
 	//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
+
+
 	try
 	{
 		//Entering Critical Section.
 		//-------------------------------------------------------------
-		WaitForSingleObject( _mapmutex, INFINITE );
-
+		WaitForSingleObject( _mapmutex, INFINITE ); // lock mutex while we work in this process
+													// make sure no other threads tries to write at the same tim
+													// wait until is unlocked
 		//Looking for the next available memory slot for the new image.
 		
 		slot = _nextMemorySlot ;
-		_nextMemorySlot = (_nextMemorySlot + 1) % _maxMemorySlots ;
+		_nextMemorySlot = (_nextMemorySlot + 1) % _maxMemorySlots ;  // this way we will cycle yo the first position
+																	// once we have passed max memory slots 
 
 		//If the slot to be used is currently used by another pallet
 		//then this old pallet has to be removed from memory now.
 		//_imageMemory es de tipo vector<ImageData>
+
+		// I find it strange that we just clear existing entries without having a way to check
+		// if we are done processing them. I would assume is done here
 		if ( !_imageMemory[slot].emptySlot )
 		{
-			prevPalletNumber = _imageMemory[slot].ownerPallet ;
-			RemovePalletInformation( prevPalletNumber );
+			prevPalletNumber = _imageMemory[slot].ownerPallet ;		// set the identifier of the previous pallet done in this slot
+			RemovePalletInformation( prevPalletNumber );			// clear
 			_pallets.erase( prevPalletNumber );
 			_classifications.erase( prevPalletNumber );
 
@@ -127,28 +135,33 @@ void AddImage( const int& palletNumber,
 		//In order to save in memory the image, it can be reused the memory
 		//previously allocated in the slot. This will be possible only if the 
 		//old image's size is the same that the new one (usually true).
-		int lineSize = deviceConfig->GetWidth() * deviceConfig->GetBytes();
+		int lineSize = deviceConfig->GetWidth() * deviceConfig->GetBytes();  // based on camera specs
 		int height = deviceConfig->GetHeight();
 		unsigned long newSize = height * lineSize;
+
+		// maybe the previous camera had different specs, in any case
 		if ( _imageMemory[slot].allocSize >= newSize )
 		{
 			//Copying the buffer in the previously allocated memory.
 			for (int i=0; i < height; i++)
 			{
-				memcpy( _imageMemory[slot].imageBuffer + i*(size_t)lineSize, ppBuffer[i], 
-					lineSize );
+				memcpy( _imageMemory[slot].imageBuffer + i*(size_t)lineSize, ppBuffer[i], 	// we will copy line by line
+					lineSize );																
 			}
-			_imageMemory[slot].ownerPallet = palletNumber;
+			_imageMemory[slot].ownerPallet = palletNumber;		// set new entry
 
 		}
 		else //The image has a bigger size from previous (or it's the 1st).
 		{
+			// and not null buffer then we clear it
 			if ( _imageMemory[slot].imageBuffer ) 
 			{
 				delete [] _imageMemory[slot].imageBuffer;
 			}
 
+			//	if  
 			unsigned char* newBuffer = new unsigned char[newSize];
+			//  if couldnt allocate the memory
 			if ( !newBuffer ) 
 			{
 				ReleaseMutex( _mapmutex );
@@ -157,11 +170,14 @@ void AddImage( const int& palletNumber,
 					ID_EXCEPT_RESULT_REPOSITORY_OUTOFMEMORY);
 			}
 
+
 			for (int i=0; i < height; i++)
 			{
 				memcpy( newBuffer + i*(size_t)lineSize, ppBuffer[i],
 					lineSize );
 			}
+
+			// set new
 			_imageMemory[slot].imageBuffer = newBuffer;
 			_imageMemory[slot].allocSize = newSize;
 			_imageMemory[slot].ownerPallet = palletNumber;
@@ -179,8 +195,11 @@ void AddImage( const int& palletNumber,
 		SavePalletInformation( palletNumber, deviceConfig, fileFormat, vMarkFirstProfile );
 
 		//-------------------------------------------------------------
-		ReleaseMutex( _mapmutex );
+		ReleaseMutex( _mapmutex ); // mutex released
 	}
+
+	// if an error happens, report the error, set where in the execution happens
+	// and 	
 	catch(Exception *e )
 	{
 		CString function = e->GetFunction() ;
@@ -190,11 +209,12 @@ void AddImage( const int& palletNumber,
 		msg.Format( "%s <- Execution point #%d", msg.GetString(), executionpoint ) ;
 		Utilities::ThrowException(function,ID_EXCEPT_RESULT_REPOSITORY,msg);
 	}
+	// catch other exeptons?
 	catch(...)
 	{
 		CString msg;
 
-		ReleaseMutex( _mapmutex );
+		ReleaseMutex( _mapmutex ); // release
 
 		msg.Format("Fail at execution point #%d", executionpoint);
 		Utilities::ThrowException("ResultRepository::AddImage",
