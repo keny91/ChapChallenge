@@ -60,6 +60,52 @@ def showQuickImage(image,tittle):
     ax1.set_title(tittle)
     ax1.imshow(image, cmap="gray")    
 
+def show2ImagesSideBySide(im1,im2,tittle):
+    fig1 = plt.figure
+    fig1, (ax1, ax2) = plt.subplots(1, 2, sharex=False, sharey=False) 
+    fig1.suptitle(tittle)
+
+    ax1.get_yaxis().set_visible(False)
+    ax1.get_xaxis().set_visible(False)
+    
+    ax1.imshow(im1,cmap='gray')
+    ax2.imshow(im2,cmap='gray')
+
+
+def showQuickHist(image,hist):
+
+    fig1, (ax1, ax2) = plt.subplots(1, 2, sharex=False, sharey=False) 
+    ax1.set_title('Binarized normalized image')
+    ax2.set_title('Histogram, range binarized')
+    ax1.get_yaxis().set_visible(False)
+    ax1.get_xaxis().set_visible(False)
+    ax1.imshow(image,cmap='gray')
+    
+    ax2.plot(range(0,256),hist,lw = 2)
+
+
+def showRangeHist(image,hist,thresh):
+    """
+    thresh is a list of 2 values [minTH,maxTH]
+    """    
+
+    fig1, (ax1, ax2) = plt.subplots(1, 2, sharex=False, sharey=False) 
+    ax1.set_title('Binarized normalized image')
+    ax2.set_title('Histogram, range binarized')
+    ax1.get_yaxis().set_visible(False)
+    ax1.get_xaxis().set_visible(False)
+    ax1.imshow(image,cmap='gray')
+    
+    
+    where_b = np.zeros(256)
+    for i in range(thresh[0],thresh[1]) : where_b[i] = True; 
+        
+    ax2.fill_between(range(0,256), 0,hist[:,0],alpha=0.3, where = where_b , color= "red")
+    ax2.plot(range(0,256),hist,lw = 2)
+
+
+
+
 
 def find_board( image):
         """
