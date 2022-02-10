@@ -1,0 +1,59 @@
+
+
+import numpy as np
+import cv2 as cv
+import matplotlib.pyplot as plt
+import SupportFunctions as mySF
+from sklearn.cluster import KMeans
+
+
+# path to the images
+TOP_IMAGES_PATH = "./camera_top"
+GREY_CALIB_IMAGES_PATH = "./greyLevelCalib"
+
+
+BOTTOM_IMAGES_PATH = "./camera_bottom/"
+
+
+scratch_label = 100
+crack_label = 101
+
+# areas of interest for each image
+area_B58_scratch = [BOTTOM_IMAGES_PATH+"B58.tif", [[1820,927]]]  #  [1780,927]
+area_D59_scratch = [BOTTOM_IMAGES_PATH+"D59.tif",[[1078,440], [1037,1088], [1000,1622]] ]
+
+area_B78_crack  = [BOTTOM_IMAGES_PATH+"B78.tif",[[800,980 ]]]  # [800,920    ]]
+area_D82_crack  = [BOTTOM_IMAGES_PATH+"D82.tif",[[274,1300 ]]]
+area_D83_crack  = [BOTTOM_IMAGES_PATH+"D83.tif",[[318,697 ]]]
+area_E24_crack  = [BOTTOM_IMAGES_PATH+"E24.tif",[[665,1614 ]]]
+area_E56_crack  = [BOTTOM_IMAGES_PATH+"E56.tif",[[540,1000 ]]]
+area_E70_crack  = [BOTTOM_IMAGES_PATH+"E70.tif",[[1730,1440]]]
+
+training_scratch_list = [area_D59_scratch]
+training_crack_list = [area_B78_crack,area_D82_crack,area_E24_crack]
+# image + labels,... there is an issue here, not knowing which is which in case of crack and scratches in the same board
+multiAreaList = [area_D59_scratch,area_B78_crack]
+test_list = [area_D83_crack,area_E56_crack,area_E70_crack,area_B58_scratch]
+all_list = [area_B58_scratch,area_D59_scratch,area_B78_crack,area_D82_crack,area_D83_crack,area_E24_crack,area_E56_crack,area_E70_crack]
+scratch_list = [area_B58_scratch,area_D59_scratch]
+crack_list = [area_B78_crack,area_D82_crack,area_D83_crack,area_E24_crack,area_E56_crack,area_E70_crack]
+
+# test_list = [[area_D83_crack,[crack_label]],[area_E56_crack,[crack_label]],[area_E70_crack,[crack_label]],[area_B58_scratch,[scratch_label]]]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
